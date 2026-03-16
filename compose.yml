@@ -18,3 +18,5 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=app
     command: ["postgres", "-c", "log_statement=all"]
+  ollama:
+    image: ollama/ollama

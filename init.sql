@@ -1,4 +1,5 @@
-create table users (
+create table prompts (
     id serial,
-    name text
+    prompt text,
+    response text
 );
