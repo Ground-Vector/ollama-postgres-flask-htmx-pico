@@ -20,3 +20,6 @@ services:
     command: ["postgres", "-c", "log_statement=all"]
   ollama:
     image: ollama/ollama
+  cron:
+    image: curlimages/curl
+    command: ["sh", "-c", "while true; do curl http://app:8080/cron; sleep 60; done"]

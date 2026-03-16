@@ -6,3 +6,6 @@ build:
 
 up:
 	docker compose up
+
+cron:
+	curl http://127.0.0.1:8080/cron

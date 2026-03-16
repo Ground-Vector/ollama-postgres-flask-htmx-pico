@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 
-from database import get_users, add_user
+from database import get_prompts, add_user, get_prompts_without_response, add_response
 from library import database_handle
 from utils import build_page
 
@@ -22,4 +22,11 @@ def register():
             add_user(db, name)
         else:
             errors.append("Name is required")
-    return render_template("register.html", **build_page(db), errors=errors, users=get_users(db))
+    return render_template("register.html", **build_page(db), errors=errors, prompts=get_prompts(db))
+
+
+@app.route("/cron")
+def cron():
+    for prompt in get_prompts_without_response(db):
+        add_response(db, prompt["id"], "test2")
+    return "OK"

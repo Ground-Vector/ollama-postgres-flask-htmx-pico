@@ -1,5 +1,5 @@
 create table prompts (
-    id serial,
+    id serial primary key,
     prompt text,
     response text
 );

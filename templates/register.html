@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-{% for user in users %}
-    <article>{{ user }}</article>
+{% for prompt in prompts %}
+    <article>
+        <header>{{ prompt['prompt'] }}</header>
+        <pre>{{ prompt['response'] }}</pre>
+    </article>
 {% endfor %}
 <form>
     <fieldset role="group">
