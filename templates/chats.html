@@ -3,7 +3,7 @@
 {% block content %}
     <section>
         {% for chat in chats %}
-            <a href="{{ url_for("chat", chat_id=chat["id"]) }}"><button>{{ chat['message'] }}</button></a>
+            <a href="{{ url_for("chat", chat_id=chat["id"]) }}"><button>{{ chat["message"] }}</button></a>
         {% endfor %}
     </section>
     <form method="post">
