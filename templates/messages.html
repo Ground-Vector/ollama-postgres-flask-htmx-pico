@@ -1,9 +1,9 @@
 {% for message in messages %}
-    <article class="message">{{ message }}</article>
+    <article class="message {{ loop.cycle("right", "left") }}">{{ message }}</article>
 {% endfor %}
 
 {% if not done %}
-    <article aria-busy="true"></article>
+    <article class="message left" aria-busy="true"></article>
 {% else %}
     <form method="post">
         <fieldset role="group">
