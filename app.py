@@ -12,9 +12,6 @@ db = database_handle()
 models = os.environ.get("OLLAMA_MODELS").split(",")
 
 
-
-
-
 @app.route("/", methods=["GET", "POST"])
 def chats():
     if request.method == "POST":
@@ -31,7 +28,7 @@ def get_chat_with_messages(db, chat_id):
     llm_messages = [chat["message"]]
     for message in messages:
         llm_messages.append(message["message"])
-    return llm_messages, chat['model'], len(llm_messages) % 2 == 0
+    return llm_messages, chat["model"], len(llm_messages) % 2 == 0
 
 
 @app.route("/chats/<int:chat_id>", methods=["GET", "POST"])
@@ -39,6 +36,7 @@ def chat(chat_id):
     if request.method == "POST":
         add_message(db, chat_id, request.form.get("message"))
     return render_template("chat.html", chat_id=chat_id)
+
 
 @app.route("/chats/<int:chat_id>/messages")
 def messages(chat_id):
