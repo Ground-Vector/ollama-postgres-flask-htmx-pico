@@ -1,5 +1,13 @@
-create table prompts (
+create table chats (
     id serial primary key,
-    prompt text,
-    response text
+    message text,
+    model text
 );
+
+create table messages (
+    id serial primary key,
+    chat_id int references chats(id),
+    message text
+);
+
+create index messages_chat_id on messages(chat_id);

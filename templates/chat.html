@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <section><a href="{{ url_for("chats") }}"><button>Back</button></a></section>
+    <section hx-get="{{ url_for('messages', chat_id=chat_id) }}" hx-trigger="every 1s [!window.messagesDone]"></section>
+    <span hx-get="{{ url_for('process', chat_id=chat_id) }}" hx-trigger="load"></span>
+{% endblock %}

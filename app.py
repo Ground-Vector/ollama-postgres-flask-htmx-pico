@@ -1,40 +1,54 @@
 import os
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from ollama import Client
 
-from database import get_prompts, add_user, get_prompts_without_response, add_response
+from database import get_chats, add_chat, get_chat, get_messages, add_message
 from library import database_handle
-from utils import build_page
+from llm import respond
 
 app = Flask(__name__)
 db = database_handle()
+models = os.environ.get("OLLAMA_MODELS").split(",")
 
 
-@app.route("/")
-def index():
-    return render_template("index.html", **build_page(db))
 
 
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    errors = []
+
+@app.route("/", methods=["GET", "POST"])
+def chats():
     if request.method == "POST":
-        name = request.form.get("name")
-        if len(name) > 0:
-            add_user(db, name)
-        else:
-            errors.append("Name is required")
-    return render_template("register.html", **build_page(db), errors=errors, prompts=get_prompts(db))
+        message = request.form.get("message")
+        model = request.form.get("model")
+        chat_id = add_chat(db, message, model)
+        return redirect(url_for("chat", chat_id=chat_id))
+    return render_template("chats.html", chats=get_chats(db), models=models)
 
 
-@app.route("/cron")
-def cron():
-    client = Client(
-        host=os.environ.get("OLLAMA_HOST"),
-        headers={"Authorization": "Bearer " + os.environ.get("OLLAMA_AUTH")},
-    )
-    for prompt in get_prompts_without_response(db):
-        response = client.chat(model=os.environ.get("OLLAMA_MODELS").split(",")[0], messages=[{"role": "user", "content": prompt["prompt"]}])
-        add_response(db, prompt["id"], response["message"]["content"].strip())
-    return "OK"
+def get_chat_with_messages(db, chat_id):
+    chat = get_chat(db, chat_id)
+    messages = get_messages(db, chat_id)
+    llm_messages = [chat["message"]]
+    for message in messages:
+        llm_messages.append(message["message"])
+    return llm_messages, chat['model'], len(llm_messages) % 2 == 0
+
+
+@app.route("/chats/<int:chat_id>", methods=["GET", "POST"])
+def chat(chat_id):
+    if request.method == "POST":
+        add_message(db, chat_id, request.form.get("message"))
+    return render_template("chat.html", chat_id=chat_id)
+
+@app.route("/chats/<int:chat_id>/messages")
+def messages(chat_id):
+    messages, model, done = get_chat_with_messages(db, chat_id)
+    return render_template("messages.html", messages=messages, done=done)
+
+
+@app.route("/chats/<int:chat_id>/process")
+def process(chat_id):
+    messages, model, done = get_chat_with_messages(db, chat_id)
+    if not done:
+        add_message(db, chat_id, respond(messages, model))
+    return ""

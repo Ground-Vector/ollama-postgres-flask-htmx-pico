@@ -1,0 +1,15 @@
+{% for message in messages %}
+    <article class="message">{{ message }}</article>
+{% endfor %}
+
+{% if not done %}
+    <article aria-busy="true"></article>
+{% else %}
+    <form method="post">
+        <fieldset role="group">
+            <input type="text" name="message" placeholder="Question">
+            <input type="submit" value="Ask">
+        </fieldset>
+    </form>
+    <script>window.messagesDone = {{ done | int }};</script>
+{% endif %}
